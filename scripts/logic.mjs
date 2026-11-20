@@ -1,9 +1,14 @@
 /**
- * Pure helpers shared by the Foundry module and Node tests.
- * Only the presentation of an override changes; the roll/action is untouched.
+ * Pure GM-only override presentation rules.
+ * Player-initiated overrides always retain DAS's default notifications.
  */
-export function shouldConcealOverride(enabled, isGM) {
-  return enabled === true && isGM !== true;
+export function shouldInterceptGmOverride(enabled, forcerIsGM) {
+  return enabled === true && forcerIsGM === true;
+}
+
+export function shouldConcealChatOverride(enabled, viewerIsGM, authorIsGM, hasOverrideFlag) {
+  return shouldInterceptGmOverride(enabled, authorIsGM)
+    && viewerIsGM !== true && hasOverrideFlag === true;
 }
 
 export function forcedAlertKey(itemName, targets = []) {

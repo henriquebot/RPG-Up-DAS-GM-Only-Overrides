@@ -3,18 +3,18 @@
  * Foundry V14 / dnd5e 6 / DAS Core >= 0.288.0
  *
  * No monkey-patching of DAS, no changes to actor/item/chat data:
- * 1. A public DAS hook prevents the default broadcast for forced rule overrides.
+ * 1. A public DAS hook prevents the public broadcast ONLY when the GM overrides a rule.
  * 2. DAS's public GM alert API keeps the usual private reasons/chat/banner.
  * 3. A GM-only query plays the floating "Forçado" on the GM client.
- * 4. Player-side chat rendering removes DAS's override banner.
+ * 4. Only GM-authored overridden chat cards are concealed on player clients.
  */
-import { shouldConcealOverride, forcedAlertKey, overrideReasons } from "./logic.mjs";
+import { shouldInterceptGmOverride, shouldConcealChatOverride, forcedAlertKey, overrideReasons } from "./logic.mjs";
 
 const ID = "rpgup-das-gm-only-overrides";
 const DAS = "dnd5e-combat";
 const SETTING = "gmOnlyOverrides";
 const PRIVATE_QUERY = `${ID}.gmForcedFloat`;
-const PLAYER_CLASS = "rpgup-das-gm-only";
+const CHAT_CARD_CLASS = "rpgup-das-gm-override-card";
 const CHAT_MARKER = ".das-overridden";
 
 function enabled() {
@@ -22,26 +22,44 @@ function enabled() {
   catch { return false; }
 }
 
-function concealForThisClient() {
-  return shouldConcealOverride(enabled(), game.user?.isGM);
+function chatAuthorIsGM(message) {
+  // Foundry ChatMessage.user is the author User document (may be a user id in
+  // custom providers). Fallback to author and the raw stored user id.
+  const author = message?.user ?? message?.author ?? message?._source?.user;
+  if (typeof author === "string") return game.users?.get(author)?.isGM === true;
+  return author?.isGM === true;
 }
 
-function syncVisuals() {
-  document.documentElement.classList.toggle(PLAYER_CLASS, concealForThisClient());
+function shouldHideChatBanner(message) {
+  const reasons = message?.getFlag?.(DAS, "overridden");
+  return shouldConcealChatOverride(
+    enabled(),
+    game.user?.isGM === true,
+    chatAuthorIsGM(message),
+    Array.isArray(reasons) && reasons.length > 0
+  );
 }
 
 function rerenderChat() {
-  syncVisuals();
+  // On disabling the option, remove the CSS marker immediately. Rerendering
+  // restores any previously suppressed labels from the original chat flags.
+  if (!enabled()) document.querySelectorAll(`.${CHAT_CARD_CLASS}`)
+    .forEach(element => element.classList.remove(CHAT_CARD_CLASS));
   try { ui.chat?.render?.(); } catch (err) { console.warn(`${ID} | chat redraw:`, err); }
 }
 
-function suppressPlayerChatBanner(_message, html) {
-  if (!concealForThisClient()) return;
-  // DAS adds its .das-overridden element in this same hook. Waiting one microtask
-  // allows all hook listeners to finish regardless of their registration order.
+function suppressPlayerChatBanner(message, html) {
+  if (!html) return;
+  const hidden = shouldHideChatBanner(message);
+  // Set a per-card marker synchronously to avoid a one-frame flash. No global
+  // CSS blanket suppression: overridden cards authored by players remain public.
+  html.classList?.toggle(CHAT_CARD_CLASS, hidden);
+  if (!hidden) return;
+  // DAS inserts the warning in the same render hook, in unspecified listener
+  // order. Remove the element only after those listeners have all executed.
   queueMicrotask(() => {
-    if (!concealForThisClient()) return;
-    html?.querySelectorAll?.(CHAT_MARKER).forEach(element => element.remove());
+    if (!shouldHideChatBanner(message)) return;
+    html.querySelectorAll?.(CHAT_MARKER).forEach(element => element.remove());
   });
 }
 
@@ -117,7 +135,8 @@ async function informGM({ actor, item, reasons, targets, user }) {
  * alert, but does not undo the action or remove its overridden chat flag.
  */
 function onForced(event) {
-  if (!enabled()) return;
+  // If a player forces a rule, do nothing: DAS sends every normal notice.
+  if (!shouldInterceptGmOverride(enabled(), event?.user?.isGM ?? game.user?.isGM)) return;
   const reasons = overrideReasons(event?.reasons);
   if (!reasons.length) return;
   void informGM({
@@ -146,6 +165,5 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   if (CONFIG.queries) CONFIG.queries[PRIVATE_QUERY] = showPrivateFloat;
-  syncVisuals();
   if (!game.modules.get(DAS)?.active) console.warn(`${ID} | DAS Core is not active.`);
 });

@@ -1,8 +1,8 @@
 {
   "id": "rpgup-das-gm-only-overrides",
   "title": "RPG Up — DAS GM-Only Overrides",
-  "description": "Oculta dos jogadores os avisos de regras ignoradas (Forçado) do DAS, preservando os alertas e o histórico para o mestre.",
-  "version": "0.1.0",
+  "description": "Oculta dos jogadores apenas os avisos de regras ignoradas pelo mestre no DAS, mantendo totalmente visíveis as ações forçadas pelos próprios jogadores.",
+  "version": "0.1.1",
   "authors": [
     {
       "name": "RPG Up",

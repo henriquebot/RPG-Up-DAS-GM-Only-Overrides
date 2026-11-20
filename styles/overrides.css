@@ -1,6 +1,6 @@
-/* The class is applied only on non-GM clients when the world setting is enabled.
-   JavaScript additionally removes the element after the dnd5e render hook.
-   CSS prevents a frame of visible flicker when messages are rendered. */
-html.rpgup-das-gm-only .das-overridden {
+/* Hide only cards whose overridden action was authored by the GM.
+ * Player-authored override cards remain completely unchanged.
+ * The marker is set by a player-side dnd5e.renderChatMessage hook. */
+.rpgup-das-gm-override-card .das-overridden {
   display: none !important;
 }
