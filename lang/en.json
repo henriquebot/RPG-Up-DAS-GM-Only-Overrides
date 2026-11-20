@@ -1,0 +1,8 @@
+{
+  "RPGUP_DAS_GM_ONLY": {
+    "Setting": {
+      "Name": "RPG Up | Show forced rule overrides to GM only",
+      "Hint": "Hides the 'Forced' floating text and 'Rule overridden' chat banner from players. The GM still sees them and, when DAS GM alerts are enabled, receives the reasons privately. Does not change actions, rolls or documents."
+    }
+  }
+}

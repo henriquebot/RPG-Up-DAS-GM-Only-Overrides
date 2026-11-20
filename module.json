@@ -1,0 +1,60 @@
+{
+  "id": "rpgup-das-gm-only-overrides",
+  "title": "RPG Up — DAS GM-Only Overrides",
+  "description": "Oculta dos jogadores os avisos de regras ignoradas (Forçado) do DAS, preservando os alertas e o histórico para o mestre.",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "RPG Up",
+      "url": "https://github.com/henriquebot"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.370"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "6.0.0",
+          "verified": "6.1.1"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "dnd5e-combat",
+        "type": "module",
+        "compatibility": {
+          "minimum": "0.288.0"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/overrides.css"
+  ],
+  "languages": [
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "url": "https://github.com/henriquebot/RPG-Up-DAS-GM-Only-Overrides",
+  "manifest": "https://raw.githubusercontent.com/henriquebot/RPG-Up-DAS-GM-Only-Overrides/main/module.json",
+  "download": "https://raw.githubusercontent.com/henriquebot/RPG-Up-DAS-GM-Only-Overrides/main/module.zip",
+  "readme": "README.md",
+  "license": "LICENSE"
+}

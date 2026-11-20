@@ -1,0 +1,8 @@
+{
+  "RPGUP_DAS_GM_ONLY": {
+    "Setting": {
+      "Name": "RPG Up | Avisos de regras ignoradas somente para o mestre",
+      "Hint": "Oculta dos jogadores o texto flutuante 'Forçado' e o aviso 'Regra ignorada' nos cartões. O mestre continua vendo os avisos e, se os alertas do DAS estiverem ligados, recebe os motivos em privado. Não altera ações, resultados nem documentos."
+    }
+  }
+}
